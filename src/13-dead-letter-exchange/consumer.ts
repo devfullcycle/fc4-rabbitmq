@@ -49,10 +49,24 @@ async function deadLetterExchange() {
           channel.ack(msg);
         } catch (error) {
           //se aconteceu um erro não reprocessável, publicar na fila de falha
+
+          const maxRetries = 3;
+          const xDeath = msg.properties.headers?.["x-death"]  || [];
+          const retryCount = xDeath[0]?.count || 0;
+          if(retryCount < maxRetries){
+            channel.nack(msg, false, false); //channel.reject(msg, false);
+            console.log(`[!] Retrying message, retry count: ${retryCount}`);
+          }else{
+            //@ts-expect-error
+            const newMsg = {error: error.message, payload: content};
+            channel.sendToQueue('fail.queue', Buffer.from(JSON.stringify(newMsg)));
+            console.log(`[!] Sending message to fail queue`);
+            channel.ack(msg);
+          }
+
           //@ts-expect-error
           console.error("[!] Processing error:", error.message);
           
-          channel.nack(msg, false, false); //channel.reject(msg, false);
 
         }
     },
