@@ -14,8 +14,11 @@ async function deadLetterExchange() {
   await channel.assertQueue('fail.queue');
 
   await channel.assertExchange('dlx.exchange', 'direct');
-  await channel.assertQueue('dlx.queue');
-  await channel.bindQueue('dlx.queue', 'dlx.exchange', 'order');
+  await channel.assertQueue('retry.queue', {
+    'messageTtl': 5000,
+    deadLetterExchange: 'amq.direct',
+  });
+  await channel.bindQueue('retry.queue', 'dlx.exchange', 'order');
 
   console.log(`[*] Waiting for messages in ${queue}. To exit press CTRL+C`);
 
