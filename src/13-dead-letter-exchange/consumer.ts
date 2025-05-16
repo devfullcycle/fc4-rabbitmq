@@ -11,6 +11,7 @@ async function deadLetterExchange() {
     deadLetterExchange: 'dlx.exchange',
   });
   await channel.bindQueue(queue, "amq.direct", 'order');
+  await channel.assertQueue('fail.queue');
 
   await channel.assertExchange('dlx.exchange', 'direct');
   await channel.assertQueue('dlx.queue');
@@ -25,7 +26,11 @@ async function deadLetterExchange() {
         const content = msg?.content.toString();
         if (!msg || !content) {
           console.log("[!] Received empty message, ignoring...");
-          msg && channel.reject(msg, false); //dispara o dead letter
+          if(msg){
+            const newMsg = {error: 'Received empty message', payload: ''};
+            channel.sendToQueue('fail.queue', Buffer.from(JSON.stringify(newMsg)));
+            channel.ack(msg);
+          }
           return;
         }
 
@@ -40,6 +45,7 @@ async function deadLetterExchange() {
           console.log("[x] Done processing");
           channel.ack(msg);
         } catch (error) {
+          //se aconteceu um erro não reprocessável, publicar na fila de falha
           //@ts-expect-error
           console.error("[!] Processing error:", error.message);
           
