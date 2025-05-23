@@ -1,4 +1,13 @@
 services:
+
+  nodejs:
+    build:
+      context: .docker/nodejs
+    volumes:
+      - .:/home/node/app
+    ports:
+      - 3000:3000
+
   rabbitmq:
     image: rabbitmq:4.1.0-management
     ports:
