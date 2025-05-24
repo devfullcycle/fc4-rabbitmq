@@ -1,0 +1,70 @@
+services:
+  nodejs:
+    build:
+      context: ./.docker/nodejs
+      dockerfile: Dockerfile
+    volumes:
+      - .:/home/node/app
+  
+  rabbitmq-node1:
+    image: rabbitmq:4.1.0-management
+    hostname: rabbitmq-node1
+    ports:
+      - 5672:5672
+      - 15672:15672
+    volumes:
+      - ./.docker/rabbitmq/rabbitmq-quorum.conf:/etc/rabbitmq/conf.d/rabbitmq-quorum.conf
+    environment:
+      - RABBITMQ_DEFAULT_USER=admin
+      - RABBITMQ_DEFAULT_PASS=admin
+      - RABBITMQ_ERLANG_COOKIE=secretcookie
+      - RABBITMQ_FEATURE_FLAGS=+khepri_db
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "check_running"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+  rabbitmq-node2:
+    image: rabbitmq:4.1.0-management
+    hostname: rabbitmq-node2
+    profiles:
+      - follower
+    ports:
+      - 5673:5672
+      - 15673:15672
+    environment:
+      - RABBITMQ_DEFAULT_USER=admin
+      - RABBITMQ_DEFAULT_PASS=admin
+      - RABBITMQ_ERLANG_COOKIE=secretcookie
+      - RABBITMQ_FEATURE_FLAGS=+khepri_db
+    volumes:
+      - ./.docker/rabbitmq/rabbitmq-quorum.conf:/etc/rabbitmq/conf.d/rabbitmq-quorum.conf
+    depends_on:
+      rabbitmq-node1:
+        condition: service_healthy
+  
+  rabbitmq-node3:
+    image: rabbitmq:4.1.0-management
+    hostname: rabbitmq-node3
+    profiles:
+      - follower
+    ports:
+      - 5674:5672
+      - 15674:15672
+    environment:
+      - RABBITMQ_DEFAULT_USER=admin
+      - RABBITMQ_DEFAULT_PASS=admin
+      - RABBITMQ_ERLANG_COOKIE=secretcookie
+      - RABBITMQ_FEATURE_FLAGS=+khepri_db
+    volumes:
+      - ./.docker/rabbitmq/rabbitmq-quorum.conf:/etc/rabbitmq/conf.d/rabbitmq-quorum.conf
+    depends_on:
+      rabbitmq-node1:
+        condition: service_healthy
+
+# para rodar somente um nó, use o comando:
+# docker-compose -f docker-compose.quorum.yaml up -d
+# para rodar todos os nós, use o comando:
+# docker-compose -f docker-compose.quorum.yaml --profile follower up -d
