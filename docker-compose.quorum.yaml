@@ -25,6 +25,8 @@ services:
       timeout: 5s
       retries: 3
       start_period: 10s
+    depends_on:
+      - rabbitmq-node1
 
   rabbitmq-node2:
     image: rabbitmq:4.1.0-management
@@ -42,7 +44,8 @@ services:
       - RABBITMQ_FEATURE_FLAGS=+khepri_db
     volumes:
       - ./.docker/rabbitmq/rabbitmq-quorum.conf:/etc/rabbitmq/conf.d/rabbitmq-quorum.conf
-    
+    depends_on:
+      - rabbitmq-node1
   
   rabbitmq-node3:
     image: rabbitmq:4.1.0-management

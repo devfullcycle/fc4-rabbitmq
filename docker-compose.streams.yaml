@@ -46,7 +46,9 @@ services:
       - RABBITMQ_FEATURE_FLAGS=+khepri_db
     volumes:
       - ./.docker/rabbitmq/rabbitmq-streams.conf:/etc/rabbitmq/conf.d/rabbitmq-streams.conf
-  
+    depends_on:
+      - rabbitmq-node1
+
   rabbitmq-node3:
     build: 
       context: ./.docker/rabbitmq
@@ -65,6 +67,8 @@ services:
       - RABBITMQ_FEATURE_FLAGS=+khepri_db
     volumes:
       - ./.docker/rabbitmq/rabbitmq-streams.conf:/etc/rabbitmq/conf.d/rabbitmq-streams.conf
+    depends_on:
+      - rabbitmq-node1
 
 # para rodar somente um nó, use o comando:
 # docker-compose -f docker-compose.streams.yaml up -d
