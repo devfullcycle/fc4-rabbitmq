@@ -1,0 +1,72 @@
+services:
+
+  java:
+    build:
+      context: ./.docker/java
+    volumes:
+      - .:/home/gradle/app
+
+  rabbitmq-node1:
+    build: 
+      context: ./.docker/rabbitmq
+    hostname: rabbitmq-node1
+    ports:
+      - 5672:5672
+      - 15672:15672
+      - 5552:5552
+    volumes:
+      - ./.docker/rabbitmq/rabbitmq-streams.conf:/etc/rabbitmq/conf.d/rabbitmq-streams.conf
+    environment:
+      - RABBITMQ_DEFAULT_USER=admin
+      - RABBITMQ_DEFAULT_PASS=admin
+      - RABBITMQ_ERLANG_COOKIE=secretcookie
+      - RABBITMQ_FEATURE_FLAGS=+khepri_db
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "check_running"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+  rabbitmq-node2:
+    build: 
+      context: ./.docker/rabbitmq
+    hostname: rabbitmq-node2
+    profiles:
+      - follower
+    restart: on-failure:5
+    ports:
+      - 5673:5672
+      - 15673:15672
+      - 5553:5552
+    environment:
+      - RABBITMQ_DEFAULT_USER=admin
+      - RABBITMQ_DEFAULT_PASS=admin
+      - RABBITMQ_ERLANG_COOKIE=secretcookie
+      - RABBITMQ_FEATURE_FLAGS=+khepri_db
+    volumes:
+      - ./.docker/rabbitmq/rabbitmq-streams.conf:/etc/rabbitmq/conf.d/rabbitmq-streams.conf
+  
+  rabbitmq-node3:
+    build: 
+      context: ./.docker/rabbitmq
+    hostname: rabbitmq-node3
+    profiles:
+      - follower
+    restart: on-failure:5
+    ports:
+      - 5674:5672
+      - 15674:15672
+      - 5554:5552
+    environment:
+      - RABBITMQ_DEFAULT_USER=admin
+      - RABBITMQ_DEFAULT_PASS=admin
+      - RABBITMQ_ERLANG_COOKIE=secretcookie
+      - RABBITMQ_FEATURE_FLAGS=+khepri_db
+    volumes:
+      - ./.docker/rabbitmq/rabbitmq-streams.conf:/etc/rabbitmq/conf.d/rabbitmq-streams.conf
+
+# para rodar somente um nó, use o comando:
+# docker-compose -f docker-compose.streams.yaml up -d
+# para rodar todos os nós, use o comando:
+# docker-compose -f docker-compose.streams.yaml --profile follower up -d
