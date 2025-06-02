@@ -3,6 +3,8 @@
  */
 package org.example;
 
+import com.rabbitmq.stream.*;
+
 public class App {
     public String getGreeting() {
         return "Hello World!";
