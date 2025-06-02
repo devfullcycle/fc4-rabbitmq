@@ -31,6 +31,7 @@ services:
     hostname: rabbitmq-node2
     profiles:
       - follower
+    restart: on-failure:5
     ports:
       - 5673:5672
       - 15673:15672
@@ -41,15 +42,14 @@ services:
       - RABBITMQ_FEATURE_FLAGS=+khepri_db
     volumes:
       - ./.docker/rabbitmq/rabbitmq-quorum.conf:/etc/rabbitmq/conf.d/rabbitmq-quorum.conf
-    depends_on:
-      rabbitmq-node1:
-        condition: service_healthy
+    
   
   rabbitmq-node3:
     image: rabbitmq:4.1.0-management
     hostname: rabbitmq-node3
     profiles:
       - follower
+    restart: on-failure:5
     ports:
       - 5674:5672
       - 15674:15672
