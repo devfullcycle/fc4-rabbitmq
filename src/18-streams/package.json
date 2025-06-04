@@ -1,0 +1,5 @@
+{
+    "scripts": {
+        "dev": "nodemon --watch app --ext java --exec './gradlew run' --signal SIGTERM"
+    }
+}
