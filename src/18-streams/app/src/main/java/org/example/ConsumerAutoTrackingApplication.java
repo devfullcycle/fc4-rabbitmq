@@ -32,6 +32,7 @@ public class ConsumerAutoTrackingApplication {
             .consumerBuilder()
             .stream("test-stream")
             .name("test-consumer-auto-tracking")
+            .singleActiveConsumer()
             .autoTrackingStrategy()
                     .messageCountBeforeStorage(100)
                     .flushInterval(Duration.ofSeconds(10))
