@@ -3,6 +3,11 @@
  */
 package org.example;
 
+import java.util.UUID;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.IntStream;
+
 import com.rabbitmq.stream.*;
 
 public class SuperProducerBatchApplication {
@@ -17,37 +22,61 @@ public class SuperProducerBatchApplication {
         env.streamCreator()
                 .stream("test-super-stream")
                 .superStream()
-                .partitions(3)
-                //.bindingKeys("key1", "key2", "key3")
+                //.partitions(3)
+                 .bindingKeys("key1", "key2", "key3")
                 .creator()
                 .create();
 
-        // //producer
-        // Producer producer = env.producerBuilder().stream("test-stream").build();
+        // producer
+        Producer producer = env
+                .producerBuilder()
+                .superStream("test-super-stream")
+                // .routing((message) -> {
+                //     int number = message.getProperties().getMessageIdAsString().hashCode();
+                //     int rest = number % 3; // 3 partições
+                //     if(rest == 0) {
+                //         return "key1";
+                //     } else if (rest == 1) {
+                //         return "key2";
+                //     } else {
+                //         return "key3";
+                //     }
+                // })
+                // .key()
+                .routing((message) -> {
+                    System.out.println("Routing message: " + message.getProperties().getMessageIdAsString());
+                    return message.getProperties().getMessageIdAsString();
+                }) //order = mumurhash(8102a744-b04a-411e-8486-bb1b990c5a11) === inteiro % 3
+                .producerBuilder()
+                .build();
 
-        // int messageCount = 10;
+        int messageCount = 100;
 
-        // CountDownLatch publishConfirmLatch = new CountDownLatch(messageCount);
+        CountDownLatch publishConfirmLatch = new CountDownLatch(messageCount);
 
-        // IntStream.range(0, messageCount).forEach(i -> {
-        // //definição da mensagem
-        // Message message = producer
-        // .messageBuilder()
-        // .addData(("Hello World " + i + "!").getBytes()).build();
-        // producer.send(message, confirmStatus -> {
-        // if(confirmStatus.isConfirmed()){
-        // System.out.println("Message " + i + " sent successfully!");
-        // } else {
-        // System.out.println("Message " + i + " sending failed: " +
-        // confirmStatus.getMessage());
-        // }
-        // publishConfirmLatch.countDown();
-        // });
-        // });
+        IntStream.range(0, messageCount).forEach(i -> {
+            // definição da mensagem
+            Message message = producer
+                    .messageBuilder()
+                    .addData(("Hello World " + i + "!").getBytes())
+                    .properties()
+                    .messageId(UUID.randomUUID()) // uuid v4
+                    .messageBuilder()
+                    .build();
+            producer.send(message, confirmStatus -> {
+                if (confirmStatus.isConfirmed()) {
+                    System.out.println("Message " + i + " sent successfully!");
+                } else {
+                    System.out.println("Message " + i + " sending failed: " +
+                            confirmStatus.getMessage());
+                }
+                publishConfirmLatch.countDown();
+            });
+        });
 
-        // publishConfirmLatch.await(10, TimeUnit.SECONDS);
+        publishConfirmLatch.await(10, TimeUnit.SECONDS);
 
-        // producer.close();
+        producer.close();
 
         env.close();
     }
