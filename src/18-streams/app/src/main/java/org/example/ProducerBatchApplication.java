@@ -18,7 +18,14 @@ public class ProducerBatchApplication {
                 .build();
         
         //assercao/declaracao da fila
-        env.streamCreator().stream("test-stream").create();
+        env.streamCreator()
+            .stream("test-stream")
+            .argument("max-length-bytes", "1000000") // Define a maximum size for the stream 
+            .argument("max-age", "7D") // Define a maximum age for the messages in the stream (politica de retenção)
+            .argument("initial-cluster-size", "3") // Define the initial cluster size
+            .argument("queue-leader-locator", "balanced") // Define the leader locator strategy (mesma coisa das filas quorum)
+            .argument("stream-max-segment-size-bytes", "100000") // Define the maximum segment size
+            .create();
 
         //producer
         Producer producer = env.producerBuilder().stream("test-stream").build();
