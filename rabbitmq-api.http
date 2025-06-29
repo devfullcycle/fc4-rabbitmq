@@ -1,2 +1,78 @@
 GET http://localhost:15672/api/queues
 Authorization: Basic admin:admin
+
+###
+
+# Listar todos os exchanges
+GET http://localhost:15672/api/exchanges
+Authorization: Basic admin:admin
+
+###
+
+# Ver visão geral do cluster
+GET http://localhost:15672/api/overview
+Authorization: Basic admin:admin
+
+###
+
+# Listar todas as conexões ativas
+GET http://localhost:15672/api/connections
+Authorization: Basic admin:admin
+
+###
+
+# Criar uma nova fila
+PUT http://localhost:15672/api/queues/%2F/test-queue
+Authorization: Basic admin:admin
+Content-Type: application/json
+
+{
+  "auto_delete": false,
+  "durable": true,
+  "arguments": {}
+}
+
+###
+
+# Publicar uma mensagem via API
+POST http://localhost:15672/api/exchanges/%2F/amq.direct/publish
+Authorization: Basic admin:admin
+Content-Type: application/json
+
+{
+  "properties": {},
+  "routing_key": "test-key",
+  "payload": "Hello World!",
+  "payload_encoding": "string"
+}
+
+###
+
+# Consumir mensagens de uma fila
+POST http://localhost:15672/api/queues/%2F/test-queue/get
+Authorization: Basic admin:admin
+Content-Type: application/json
+
+{
+  "count": 1,
+  "ackmode": "ack_requeue_true",
+  "encoding": "auto"
+}
+
+###
+
+# Obter informações de uma fila específica
+GET http://localhost:15672/api/queues/%2F/test-queue
+Authorization: Basic admin:admin
+
+###
+
+# Listar bindings
+GET http://localhost:15672/api/bindings
+Authorization: Basic admin:admin
+
+###
+
+# Purgar todas as mensagens de uma fila
+DELETE http://localhost:15672/api/queues/%2F/test-queue/contents
+Authorization: Basic admin:admin
