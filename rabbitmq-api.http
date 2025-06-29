@@ -1,0 +1,2 @@
+GET http://localhost:15672/api/queues
+Authorization: Basic admin:admin
