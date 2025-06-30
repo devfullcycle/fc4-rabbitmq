@@ -6,7 +6,8 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
-    "amqplib": "^0.10.7"
+    "amqplib": "^0.10.7",
+    "mqtt": "^5.13.1"
   },
   "devDependencies": {
     "@types/amqplib": "^0.10.7",
