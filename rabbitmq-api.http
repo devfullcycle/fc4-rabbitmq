@@ -76,3 +76,36 @@ Authorization: Basic admin:admin
 # Purgar todas as mensagens de uma fila
 DELETE http://localhost:15672/api/queues/%2F/test-queue/contents
 Authorization: Basic admin:admin
+
+### shovels
+GET http://localhost:15672/api/shovels
+Authorization: Basic admin:admin
+
+###
+PUT http://localhost:15672/api/parameters/shovel/%2F/my_shovel
+Authorization: Basic admin:admin
+Content-Type: application/json
+
+{
+  "component": "shovel",
+  "name": "my_shovel",
+  "vhost": "/",
+  "value": {
+    "src-uri": ["amqp://"],
+    "dest-uri": "amqp://",
+    "src-queue": "test-stream",
+    "dest-queue": "dest-stream",
+    "ack-mode": "on-confirm",
+    "reconnect-delay": 5,
+    "src-queue-args": {
+      "x-queue-type": "stream"
+    },
+    "dest-queue-args": {
+      "x-queue-type": "stream"
+    }
+  }
+}
+
+###
+DELETE http://localhost:15672/api/parameters/shovel/%2F/my_shovel
+Authorization: Basic admin:admin
