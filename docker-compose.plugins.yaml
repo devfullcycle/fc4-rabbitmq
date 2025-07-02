@@ -18,3 +18,48 @@ services:
     environment:
       - RABBITMQ_DEFAULT_USER=admin
       - RABBITMQ_DEFAULT_PASS=admin
+  
+  rabbitmq-norte:
+    build: 
+      context: ./.docker/rabbitmq
+      dockerfile: Dockerfile.plugins
+    hostname: rabbitmq-norte
+    profiles:
+      - multi-region
+    ports:
+      - 5673:5672
+      - 15673:15672
+    environment:
+      - RABBITMQ_DEFAULT_USER=admin
+      - RABBITMQ_DEFAULT_PASS=admin
+  
+  rabbitmq-sul:
+    build: 
+      context: ./.docker/rabbitmq
+      dockerfile: Dockerfile.plugins
+    hostname: rabbitmq-sul
+    profiles:
+      - multi-region
+    ports:
+      - 5674:5672
+      - 15674:15672
+    environment:
+      - RABBITMQ_DEFAULT_USER=admin
+      - RABBITMQ_DEFAULT_PASS=admin
+  
+  rabbitmq-sudeste:
+    build: 
+      context: ./.docker/rabbitmq
+      dockerfile: Dockerfile.plugins
+    hostname: rabbitmq-sudeste
+    profiles:
+      - multi-region
+    ports:
+      - 5676:5672
+      - 15676:15672
+    environment:
+      - RABBITMQ_DEFAULT_USER=admin
+      - RABBITMQ_DEFAULT_PASS=admin
+
+# para rodar multi-region
+# docker compose -f docker-compose.plugins.yaml --profile multi-region up --build -d
