@@ -1,0 +1,32 @@
+services:
+
+  nodejs:
+    build:
+      context: .docker/nodejs
+    volumes:
+      - .:/home/node/app
+    ports:
+      - 3000:3000
+
+  rabbitmq:
+    image: rabbitmq:4.1.0-management
+    ports:
+      - 5672:5672
+      - 15672:15672
+    environment:
+      - RABBITMQ_DEFAULT_USER=admin
+      - RABBITMQ_DEFAULT_PASS=admin
+  
+  postgres:
+    image: postgres:17.5-alpine3.22
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=test
+  
+  redis:
+    image: redis:7.2.0-alpine
+    ports:
+      - 6379:6379
+

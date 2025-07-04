@@ -7,7 +7,9 @@
   },
   "dependencies": {
     "amqplib": "^0.10.7",
-    "mqtt": "^5.13.1"
+    "ioredis": "^5.6.1",
+    "mqtt": "^5.13.1",
+    "pg-promise": "^11.14.0"
   },
   "devDependencies": {
     "@types/amqplib": "^0.10.7",
