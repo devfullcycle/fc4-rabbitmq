@@ -1,0 +1,7 @@
+FROM rabbitmq:4.1.0-management
+
+COPY rabbitmq_message_deduplication-0.7.1.ez /opt/rabbitmq/plugins/rabbitmq_message_deduplication-0.7.1.ez
+COPY elixir-1.18.3.ez /opt/rabbitmq/plugins/elixir-1.18.3.ez
+
+RUN rabbitmq-plugins enable \
+    rabbitmq_message_deduplication

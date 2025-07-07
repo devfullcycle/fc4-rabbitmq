@@ -9,7 +9,9 @@ services:
       - 3000:3000
 
   rabbitmq:
-    image: rabbitmq:4.1.0-management
+    build:
+      context: .docker/rabbitmq
+      dockerfile: Dockerfile.best-practice
     ports:
       - 5672:5672
       - 15672:15672

@@ -19,11 +19,25 @@ public class ProducerApplication {
         //assercao/declaracao da fila
         env.streamCreator().stream("test-stream").create();
 
+        //producer name + publishing id !== messageId
+        //producer name = producer-test
+        //publishing id = 1
+        //messageId = uuid, hash, etc, etc
+
         //producer
-        Producer producer = env.producerBuilder().stream("test-stream").build();
+        Producer producer = env.producerBuilder()
+                        .stream("test-stream")
+                        //.name("producer-test") //apenas para deduplicação de mensagens
+                        .build();
 
         //definição da mensagem
-        Message message = producer.messageBuilder().addData("Hello World!".getBytes()).build();
+        Message message = producer.messageBuilder()
+                    // .publishingId(1) //opcional, pode ser usado para deduplicação
+                    // .properties()
+                    //     .messageId("1") 
+                    // .messageBuilder()
+                    .addData("Hello World!".getBytes())
+                    .build();
 
 
         CountDownLatch publishConfirmLatch = new CountDownLatch(1);
