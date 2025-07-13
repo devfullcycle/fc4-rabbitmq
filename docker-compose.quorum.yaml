@@ -25,9 +25,7 @@ services:
       timeout: 5s
       retries: 3
       start_period: 10s
-    depends_on:
-      - rabbitmq-node1
-
+      
   rabbitmq-node2:
     image: rabbitmq:4.1.0-management
     hostname: rabbitmq-node2
